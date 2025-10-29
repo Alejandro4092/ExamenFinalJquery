@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Info Jugador</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/jquery-3.7.1.js"></script>
+    <script src="/js/bootstrap.bundle.js"></script>
+
+    <style>
+        body {
+            padding-top: 80px;
+        }
+
+        img {
+            border-radius: 10px;
+        }
+
+        .container img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <div class="container-fluid">
+            <img src="images/logo.png" style="width: 50px;" alt="">
+         
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="web30homeApuestas.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="web30crearapuestas.html">Create apuesta</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="web30verapuestas.html">Apuestas</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="container mt-4">
+      <div class="bg-body-tertiary p-5 rounded">
+			<h1>Create</h1>
+            <label>ID Personaje</label>
+            <input type="text" name="" id="cajaidpersonaje" class="form-control" /><br>
+            <label>Nombre</label>
+            <input type="text" name="" id="cajanombre" class="form-control" /><br>
+            <h2 id="mensaje"></h2>
+            <label>Imagen</label>
+            <input type="text" name="" id="cajaimagen" class="form-control" /><br>
+            <label>ID serie</label>
+            <input type="text" name="" id="cajaidserie" class="form-control" /><br>
+
+            <button id="botoninsertar">Insertar Personaje</button>
+        </div>
+    </main>
+
+    <script>
+        const url = "https://apiseriespersonajes.azurewebsites.net/";
+      $(document).ready(function () {
+            $("#botoninsertar").click(function(){
+            var requestPost="api/personajes";
+            var idPersonaje=$("#cajaidpersonaje").val();
+            var idSerie=$("#cajaidserie").val();
+            var nombre=$("#cajanombre").val();
+            var imagen=$("#cajaimagen").val();
+            //Creamos un nuevo objeto personaje
+            var personaje= new Object();
+            personaje.idPersonaje=parseInt(idPersonaje);
+            personaje.nombre=nombre;
+            personaje.imagen=imagen;
+            personaje.idSerie=parseInt(idSerie);
+
+            //Convertimos ente objeto a formato JSON
+            var personajeJson= JSON.stringify(personaje);
+            console.log(personajeJson);
+            $.ajax({
+                url: url+requestPost,
+                type: "POST",
+                contentType: "application/json",
+                data: personajeJson,
+                success:function(respuesta){
+                    console.log(respuesta);
+                    $("#mensaje").text("Personaje insertado");
+                    window.location.href="homeseries.html";
+                }
+            })
+            })
+			
+		});
+            
+			
+    </script>
+</body>
+
+</html>

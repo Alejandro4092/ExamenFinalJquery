@@ -1,56 +1,36 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-bs-theme="auto">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Astro v5.13.2">
-    <title>Fixed top navbar example · Bootstrap v5.3</title>
-    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/navbar-fixed/">
-    <script src="js/color-modes.js"></script>
+    <title>Info Jugador</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <meta name="theme-color" content="#712cf9">
-    <link href="css/navbar-fixed.css" rel="stylesheet">
+    <script src="js/jquery-3.7.1.js"></script>
+    <script src="/js/bootstrap.bundle.js"></script>
+
     <style>
-        .bd-placeholder-img {
-            font-size: 1.125rem;
-            text-anchor: middle;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            user-select: none;
+        body {
+            padding-top: 80px;
         }
 
-        @media (min-width: 768px) {
-            .bd-placeholder-img-lg {
-                font-size: 3.5rem;
-            }
+        img {
+            border-radius: 10px;
         }
 
-        .btn-bd-primary {
-            --bd-violet-bg: #712cf9;
-            --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
-            --bs-btn-font-weight: 600;
-            --bs-btn-color: var(--bs-white);
-            --bs-btn-bg: var(--bd-violet-bg);
-            --bs-btn-border-color: var(--bd-violet-bg);
-            --bs-btn-hover-color: var(--bs-white);
-            --bs-btn-hover-bg: #6528e0;
-            --bs-btn-hover-border-color: #6528e0;
-            --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
-            --bs-btn-active-color: var(--bs-btn-hover-color);
-            --bs-btn-active-bg: #5a23c8;
-            --bs-btn-active-border-color: #5a23c8;
+        .container img {
+            max-width: 100%;
+            height: auto;
         }
     </style>
 </head>
 
 <body>
+    <!-- NAVBAR -->
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
         <div class="container-fluid">
             <img src="images/logo.png" style="width: 50px;" alt="">
-
+        
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -62,7 +42,7 @@
                         <a class="nav-link active" aria-current="page" href="homeseries.html">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="web30crearapuestas.html">Create apuesta</a>
+                        <a class="nav-link active" aria-current="page" href="createpersonaje.html">Create personaje</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="web30verapuestas.html">Apuestas</a>
@@ -70,23 +50,19 @@
                     <li>
                         <select id="selectSeries" class="form-select">
                             <option value="">Cargando series...</option>
-                    </li>
+                        </select>
                 </ul>
             </div>
         </div>
     </nav>
 
-     <main class="container mt-4">
-
-    <!-- Contenedor Info del Equipo -->
-    <div id="infoEquipo" class="mb-3">
-      <h2 id="nombreEquipo">Cargando...</h2>
-      <img id="imagenEquipo" src="" width="200" class="mb-3">
-      <p id="descripcionEquipo"></p>
-      <button id="btnVerJugadores" class="btn btn-info me-2">Jugadores</button>
-    </div>
-
-    <!-- Contenedor Jugadores -->
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="container mt-4">
+        <div class="bg-body-tertiary p-5 rounded">
+            <h1>Detalles de la Serie</h1>
+            <ul id="seriesdetails" class="list-group"></ul>
+        </div>
+         <!-- Contenedor Personajes -->
     <div id="jugadoresEquipo" style="display:none;">
       <h2 id="tituloJugadores"></h2>
       <table class="table table-striped align-middle">
@@ -105,76 +81,22 @@
 
   </main>
 
-    <script src="js/jquery-3.7.1.js"></script>
-    <script src="/js/bootstrap.bundle.js"></script>
- <script>
-    const url = "https://apiapuestas.azurewebsites.net/";
+    </main>
 
-    const params = new URLSearchParams(window.location.search);
-    let idEquipo = params.get("idEquipo");
-
-    let equipoActual = null;
-
-    // Cargar lista de equipos en el select
-    function cargarSelectEquipos() {
+    <script>
+        const url = "https://apiseriespersonajes.azurewebsites.net/";
+        function cargarPersonajes() {
       $.ajax({
-        url: url + "api/Equipos",
+        url: url + "api/Series/PersonajesSerie/" + idSerie,
         type: "GET",
         dataType: "json",
-        success: function (data) {
-          let html = "<option value=''>Selecciona un equipo...</option>";
-          $.each(data, function (index, equipo) {
-            html += "<option value='" + equipo.idEquipo + "'>" + equipo.nombre + "</option>";
-          });
-          $("#selectEquipos").html(html);
-
-          if (idEquipo) {
-            $("#selectEquipos").val(idEquipo);
-          }
-        },
-        error: function () {
-          alert("Error cargando equipos");
-        }
-      });
-    }
-
-    // Cargar info del equipo
-    function cargarInfoEquipo() {
-      if (!idEquipo) return;
-      $.ajax({
-        url: url + "api/Equipos/" + idEquipo,
-        type: "GET",
-        dataType: "json",
-        success: function (equipo) {
-          equipoActual = equipo;
-          $("#nombreEquipo").text(equipo.nombre);
-          $("#imagenEquipo").attr("src", equipo.imagen).show();
-          $("#descripcionEquipo").text(equipo.descripcion);
-          $("#infoEquipo").show();
-          $("#jugadoresEquipo").hide();
-        },
-        error: function (xhr, status, error) {
-          console.error("Error AJAX:", status, error);
-          alert("No se pudo cargar la información del equipo.");
-        }
-      });
-    }
-
-    // Cargar jugadores del equipo
-    function cargarJugadores() {
-      if (!equipoActual) return;
-
-      $.ajax({
-        url: url + "api/Jugadores/JugadoresEquipos/" + idEquipo,
-        type: "GET",
-        dataType: "json",
-        success: function (jugadores) {
-          $("#tituloJugadores").text("Jugadores del " + equipoActual.nombre);
+        success: function (personajes) {
+          $("#tituloJugadores").text("Personajes del " + equipoActual.nombre);
 
           let html = "";
-          $.each(jugadores, function (i, jugador) {
+          $.each(personajes, function (i, personaje) {
             html += "<tr>";
-            html += "<td>" + jugador.nombre + "</td>";
+            html += "<td>" + personaje.nombre + "</td>";
             html += "<td>" + jugador.posicion + "</td>";
             html += "<td><img src='" + jugador.imagen + "' width='120'></td>";
             html += "<td><a class='btn btn-info btn-sm' href='web30details.html?idJugador=" + jugador.idJugador + "'>Detalles</a></td>";
@@ -191,34 +113,62 @@
         }
       });
     }
+        $(document).ready(function () {
+             cargarSeriesSelect();
+              $("#btnVerJugadores").click(function () {
+        cargarPersonajes();
+       
+      });
+            const params = new URLSearchParams(window.location.search);
+            const idSerie = params.get("idSerie");
+            console.log("Id serie: " + idSerie);
 
-    $(document).ready(function () {
-      cargarSelectEquipos();
+            if (!idSerie) {
+                $("#seriesdetails").html("<li class='list-group-item text-danger'>No se ha especificado una serie.</li>");
+                return;
+            }
 
-      if (idEquipo) {
-        cargarInfoEquipo();
-      }
+            const request = "api/series/" + idSerie;
 
-      // Cuando cambia el select, actualizamos la página
-      $("#selectEquipos").change(function () {
-        idEquipo = $(this).val();
-        if (idEquipo) {
-          cargarInfoEquipo();
-        } else {
-          $("#infoEquipo").hide();
-          $("#jugadoresEquipo").hide();
+            $.ajax({
+                url: url + request,
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+
+                    let html = "";
+                    html += "<img src='" + data.imagen + "' width='200' class='img-fluid'>";
+                    html += "<li class='list-group-item'><strong>Nombre:</strong> " + data.nombre + "</li>";
+                    html += "<li class='list-group-item'><strong>IMBD:</strong> " + data.puntuacion + "</li>";
+                    html +="<li><button id='btnVerPersonajes' class='btn btn-primary'>Ver Personajes</button></li>";
+                    // Mostrar imagen correctamente como <img>
+                    html += "<li class='list-group-item text-center'>";
+                    
+                    
+
+                    $("#seriesdetails").html(html);
+                },
+                
+            });
+             function cargarSeriesSelect() {
+            let request = "api/series";
+            $.ajax({
+                url: url + request,
+                type: "GET",
+                success: function (data) {
+                    let html = ""
+                    $.each(data, function (index, serie) {
+                        html += "<option value='" + serie.idSerie + "'>" + serie.nombre + "</option>";
+                    });
+                    $("#selectSeries").html(html);
+                }
+            });
         }
-      });
+          
+        });
+        
+    </script>
+</body>
 
-      // Botón "Jugadores"
-      $("#btnVerJugadores").click(function () {
-        cargarJugadores();
-      });
-
-      // Botón "Volver"
-      $("#btnVolver").click(function () {
-        $("#jugadoresEquipo").hide();
-        $("#infoEquipo").show();
-      });
-    });
-  </script>
+</html>

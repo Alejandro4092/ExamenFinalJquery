@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Info Jugador</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/jquery-3.7.1.js"></script>
+    <script src="/js/bootstrap.bundle.js"></script>
+
+    <style>
+        body {
+            padding-top: 80px;
+        }
+
+        img {
+            border-radius: 10px;
+        }
+
+        .container img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <div class="container-fluid">
+            <img src="images/logo.png" style="width: 50px;" alt="">
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="homeseries.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="createpersonaje.html">Create Personaje</a>
+                    </li>
+                    <li class="nav-item">
+                       
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="container mt-4">
+        <ul>
+        <li>
+            <label>Selecciona Serie:</label>
+            <select id="selectSeries" class="form-select">
+                <option value="">Cargando series...</option>
+            </select>
+            <label>Selecciona Personaje:</label>
+            <select id="selectPersonajes" class="form-select">
+                <option value="">Cargando personajes...</option>
+         </select>
+        </li>
+        <button id="botoncambiar" class="btn btn-primary mt-3"">Cambiar Personaje de Serie</button>
+        </ul>
+       
+            
+
+    </main>
+
+    <script>
+        const url = "https://apiseriespersonajes.azurewebsites.net/";
+        $(document).ready(function () {
+            cargarPersonajesSelect();
+            cargarSeriesSelect();
+            $("#botoncambiar").click(function(){
+                cambiarpersonajeserie();
+            })
+        });
+
+        function cargarSeriesSelect() {
+            let request = "api/series";
+            $.ajax({
+                url: url + request,
+                type: "GET",
+                success: function (data) {
+                    let html = ""
+                    $.each(data, function (index, serie) {
+                        html += "<option value='" + serie.idSerie + "'>" + serie.nombre + "</option>";
+                    });
+                    $("#selectSeries").html(html);
+                }
+            });
+        }
+        function cargarPersonajesSelect() {
+            let request = "api/personajes";
+            $.ajax({
+                url: url + request,
+                type: "GET",
+                success: function (data) {
+                    let html = ""
+                    $.each(data, function (index, personaje) {
+                        html += "<option value='" + personaje.idPersonaje + "'>" + personaje.nombre + "</option>";
+                    });
+                    $("#selectPersonajes").html(html);
+                }
+            });
+        }
+        function cambiarpersonajeserie() {
+            var idSerie = $("#selectSeries").val();
+            var idPersonaje = $("#selectPersonajes").val();
+
+            $.ajax({
+                url: url + "/api/Personajes/" + idPersonaje + "/" + idSerie,
+                type: "PUT",
+                success: function (respuesta) {
+                    console.log(respuesta);
+                    alert("Personaje cambiado de serie correctamente");
+                }
+            });
+        }
+
+
+    </script>
+</body>
+
+</html>
