@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Astro v5.13.2">
+    <title>Fixed top navbar example · Bootstrap v5.3</title>
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/navbar-fixed/">
+    <script src="js/color-modes.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <meta name="theme-color" content="#712cf9">
+    <link href="css/navbar-fixed.css" rel="stylesheet">
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        .btn-bd-primary {
+            --bd-violet-bg: #712cf9;
+            --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+            --bs-btn-font-weight: 600;
+            --bs-btn-color: var(--bs-white);
+            --bs-btn-bg: var(--bd-violet-bg);
+            --bs-btn-border-color: var(--bd-violet-bg);
+            --bs-btn-hover-color: var(--bs-white);
+            --bs-btn-hover-bg: #6528e0;
+            --bs-btn-hover-border-color: #6528e0;
+            --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+            --bs-btn-active-color: var(--bs-btn-hover-color);
+            --bs-btn-active-bg: #5a23c8;
+            --bs-btn-active-border-color: #5a23c8;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <div class="container-fluid">
+            <img src="images/logo.png" style="width: 50px;" alt="">
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="homeseries.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="web30crearapuestas.html">Create apuesta</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="web30verapuestas.html">Apuestas</a>
+                    </li>
+                    <li>
+                        <select id="selectSeries" class="form-select">
+                            <option value="">Cargando series...</option>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-5 pt-5">
+        <!-- Select de Equipos -->
+
+
+
+    </main>
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script src="/js/bootstrap.bundle.js"></script>
+    <script>
+        let url = "https://apiseriespersonajes.azurewebsites.net/";
+
+        $(document).ready(function () {
+            let request = "api/series";
+            $.ajax({
+                url: url + request,
+                type: "GET",
+                success: function (data) {
+                    let html = ""
+                    $.each(data, function (index, serie) {
+                        html += "<option value='" + serie.idSerie + "'>" + serie.nombre + "</option>";
+                    });
+                    $("#selectSeries").html(html);
+                }
+            });
+
+            $("#selectSeries").change(function () {
+                let idSerie = $(this).val();
+                
+                if (idSerie) {
+                    window.location.href = "infoserie.html?idSerie="+idSerie;
+                }
+            });
+        });
+    </script>
+
+
+</body>
+
+</html>

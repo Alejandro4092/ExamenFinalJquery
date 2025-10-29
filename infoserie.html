@@ -1,0 +1,224 @@
+ <!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Astro v5.13.2">
+    <title>Fixed top navbar example · Bootstrap v5.3</title>
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/navbar-fixed/">
+    <script src="js/color-modes.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <meta name="theme-color" content="#712cf9">
+    <link href="css/navbar-fixed.css" rel="stylesheet">
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        .btn-bd-primary {
+            --bd-violet-bg: #712cf9;
+            --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+            --bs-btn-font-weight: 600;
+            --bs-btn-color: var(--bs-white);
+            --bs-btn-bg: var(--bd-violet-bg);
+            --bs-btn-border-color: var(--bd-violet-bg);
+            --bs-btn-hover-color: var(--bs-white);
+            --bs-btn-hover-bg: #6528e0;
+            --bs-btn-hover-border-color: #6528e0;
+            --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+            --bs-btn-active-color: var(--bs-btn-hover-color);
+            --bs-btn-active-bg: #5a23c8;
+            --bs-btn-active-border-color: #5a23c8;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <div class="container-fluid">
+            <img src="images/logo.png" style="width: 50px;" alt="">
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="homeseries.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="web30crearapuestas.html">Create apuesta</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="web30verapuestas.html">Apuestas</a>
+                    </li>
+                    <li>
+                        <select id="selectSeries" class="form-select">
+                            <option value="">Cargando series...</option>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+     <main class="container mt-4">
+
+    <!-- Contenedor Info del Equipo -->
+    <div id="infoEquipo" class="mb-3">
+      <h2 id="nombreEquipo">Cargando...</h2>
+      <img id="imagenEquipo" src="" width="200" class="mb-3">
+      <p id="descripcionEquipo"></p>
+      <button id="btnVerJugadores" class="btn btn-info me-2">Jugadores</button>
+    </div>
+
+    <!-- Contenedor Jugadores -->
+    <div id="jugadoresEquipo" style="display:none;">
+      <h2 id="tituloJugadores"></h2>
+      <table class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Posición</th>
+            <th>Imagen</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tablaJugadores"></tbody>
+      </table>
+      <button id="btnVolver" class="btn btn-primary">Volver</button>
+    </div>
+
+  </main>
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script src="/js/bootstrap.bundle.js"></script>
+ <script>
+    const url = "https://apiapuestas.azurewebsites.net/";
+
+    const params = new URLSearchParams(window.location.search);
+    let idEquipo = params.get("idEquipo");
+
+    let equipoActual = null;
+
+    // Cargar lista de equipos en el select
+    function cargarSelectEquipos() {
+      $.ajax({
+        url: url + "api/Equipos",
+        type: "GET",
+        dataType: "json",
+        success: function (data) {
+          let html = "<option value=''>Selecciona un equipo...</option>";
+          $.each(data, function (index, equipo) {
+            html += "<option value='" + equipo.idEquipo + "'>" + equipo.nombre + "</option>";
+          });
+          $("#selectEquipos").html(html);
+
+          if (idEquipo) {
+            $("#selectEquipos").val(idEquipo);
+          }
+        },
+        error: function () {
+          alert("Error cargando equipos");
+        }
+      });
+    }
+
+    // Cargar info del equipo
+    function cargarInfoEquipo() {
+      if (!idEquipo) return;
+      $.ajax({
+        url: url + "api/Equipos/" + idEquipo,
+        type: "GET",
+        dataType: "json",
+        success: function (equipo) {
+          equipoActual = equipo;
+          $("#nombreEquipo").text(equipo.nombre);
+          $("#imagenEquipo").attr("src", equipo.imagen).show();
+          $("#descripcionEquipo").text(equipo.descripcion);
+          $("#infoEquipo").show();
+          $("#jugadoresEquipo").hide();
+        },
+        error: function (xhr, status, error) {
+          console.error("Error AJAX:", status, error);
+          alert("No se pudo cargar la información del equipo.");
+        }
+      });
+    }
+
+    // Cargar jugadores del equipo
+    function cargarJugadores() {
+      if (!equipoActual) return;
+
+      $.ajax({
+        url: url + "api/Jugadores/JugadoresEquipos/" + idEquipo,
+        type: "GET",
+        dataType: "json",
+        success: function (jugadores) {
+          $("#tituloJugadores").text("Jugadores del " + equipoActual.nombre);
+
+          let html = "";
+          $.each(jugadores, function (i, jugador) {
+            html += "<tr>";
+            html += "<td>" + jugador.nombre + "</td>";
+            html += "<td>" + jugador.posicion + "</td>";
+            html += "<td><img src='" + jugador.imagen + "' width='120'></td>";
+            html += "<td><a class='btn btn-info btn-sm' href='web30details.html?idJugador=" + jugador.idJugador + "'>Detalles</a></td>";
+            html += "</tr>";
+          });
+
+          $("#tablaJugadores").html(html);
+          $("#infoEquipo").hide();
+          $("#jugadoresEquipo").show();
+        },
+        error: function (xhr, status, error) {
+          console.error("Error cargando jugadores:", status, error);
+          alert("No se pudieron cargar los jugadores.");
+        }
+      });
+    }
+
+    $(document).ready(function () {
+      cargarSelectEquipos();
+
+      if (idEquipo) {
+        cargarInfoEquipo();
+      }
+
+      // Cuando cambia el select, actualizamos la página
+      $("#selectEquipos").change(function () {
+        idEquipo = $(this).val();
+        if (idEquipo) {
+          cargarInfoEquipo();
+        } else {
+          $("#infoEquipo").hide();
+          $("#jugadoresEquipo").hide();
+        }
+      });
+
+      // Botón "Jugadores"
+      $("#btnVerJugadores").click(function () {
+        cargarJugadores();
+      });
+
+      // Botón "Volver"
+      $("#btnVolver").click(function () {
+        $("#jugadoresEquipo").hide();
+        $("#infoEquipo").show();
+      });
+    });
+  </script>
